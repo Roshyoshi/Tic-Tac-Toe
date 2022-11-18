@@ -3,11 +3,11 @@
 # Game class for game board of tic tac toe, players and simulation of turns
 class Game
   def initialize
-    puts "Welcome to Tic Tac Toe!"
-    print "Enter board size (range of 3 to 10): "
+    puts 'Welcome to Tic Tac Toe!'
+    print 'Enter board size (range of 3 to 10): '
     size = gets.chomp.to_i
-    until size in 3..10
-      print "Enter valid board size: "
+    until (3..10).include?(size)
+      print 'Enter valid board size: '
       size = gets.chomp.to_i
     end
     @game_board = Board.new(size)
@@ -21,12 +21,12 @@ class Game
       current_result = Player.get_winner(@game_board)
       return current_result unless current_result.nil?
     end
-    return nil
+    nil
   end
 
   def print_board
     @game_board.board.each do |row|
-      row.each { |square| print square.nil? ? "#" : square}
+      row.each { |square| print square.nil? ? '#' : square }
       puts ''
     end
     puts ''
@@ -42,18 +42,20 @@ class Player
   end
 
   def move(board)
-  puts "Player #{@role}'s move! Enter two numbers between 1 and #{board.size}."
+    puts "Player #{@role}'s move! Enter two numbers between 1 and #{board.size}."
     move = [0, 0]
-    while true
+    loop do
       print 'The format is "x y" : '
       move = gets.chomp.split.map(&:to_i)
       next if move.nil?
       next if move.count != 2
       next if move.none? { |coord| Range.new(1, board.size).include?(coord) }
+
       move = move.map { |num| num - 1 }
       move[1] = board.size - 1 - move[1]
       next unless board[move[1]][move[0]].nil?
-      board[ move[1]][move[0]] = @role
+
+      board[move[1]][move[0]] = @role
       break
     end
     puts ''
@@ -62,15 +64,15 @@ class Player
   def self.get_winner(board)
     [board.board, board.flip.board].each do |board|
       board.each do |row|
-        return row[0] if row.uniq.count == 1 && row.uniq[0] != nil
+        return row[0] if row.uniq.count == 1 && !row.uniq[0].nil?
       end
     end
-      
+
     [board, board.reverse].each do |arr|
-        diagonal_arr = arr.diagonal_arr_calc
-        return diagonal_arr[0] if diagonal_arr.uniq.count == 1 && diagonal_arr.uniq[0] != nil
+      diagonal_arr = arr.diagonal_arr_calc
+      return diagonal_arr[0] if diagonal_arr.uniq.count == 1 && !diagonal_arr.uniq[0].nil?
     end
-    return nil
+    nil
   end
 end
 
@@ -78,7 +80,7 @@ end
 class Board
   attr_reader :board, :size
 
-  def initialize(size, board=nil)
+  def initialize(size, board = nil)
     @size = size
     @board = board.nil? ? Array.new(size) { Array.new(size, nil) } : board
   end
@@ -90,11 +92,13 @@ class Board
       element += 1
     end
   end
+
   def reverse
-    return Board.new(@size, @board.map(&:reverse))
+    Board.new(@size, @board.map(&:reverse))
   end
+
   def flip
-    return Board.new(@size, @board.transpose.map(&:reverse))
+    Board.new(@size, @board.transpose.map(&:reverse))
   end
 end
 
