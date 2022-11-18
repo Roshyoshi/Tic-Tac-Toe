@@ -4,7 +4,13 @@
 class Game
   def initialize
     puts "Welcome to Tic Tac Toe!"
-    @game_board = Board.new(3)
+    print "Enter board size (range of 3 to 10): "
+    size = gets.chomp.to_i
+    until size in 3..10
+      print "Enter valid board size: "
+      size = gets.chomp.to_i
+    end
+    @game_board = Board.new(size)
     @players = [Player.new('O'), Player.new('X')]
   end
 
@@ -36,16 +42,16 @@ class Player
   end
 
   def move(board)
-    puts "Player #{@role}'s move! Enter two numbers between 1 and 3."
+  puts "Player #{@role}'s move! Enter two numbers between 1 and #{board.size}."
     move = [0, 0]
     while true
       print 'The format is "x y" : '
       move = gets.chomp.split.map(&:to_i)
       next if move.nil?
       next if move.count != 2
-      next if move.none? { |coord| coord in 1..3 }
+      next if move.none? { |coord| Range.new(1, board.size).include?(coord) }
       move = move.map { |num| num - 1 }
-      move[1] = 2 - move[1]
+      move[1] = board.size - 1 - move[1]
       next unless board[move[1]][move[0]].nil?
       board[ move[1]][move[0]] = @role
       break
@@ -70,7 +76,7 @@ end
 
 # Board class for representing game board. Also helps with decision of winner.
 class Board
-  attr_reader :board
+  attr_reader :board, :size
 
   def initialize(size, board=nil)
     @size = size
