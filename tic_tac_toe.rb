@@ -3,33 +3,38 @@
 # Game class for game board of tic tac toe, players and simulation of turns
 class Game
   def initialize
-    puts 'Welcome to Tic Tac Toe!'
-    print 'Enter board size (range of 3 to 10): '
-    size = gets.chomp.to_i
-    until (3..10).include?(size)
-      print 'Enter valid board size: '
-      size = gets.chomp.to_i
-    end
-    @game_board = Board.new(size)
+    puts 'Welcome to Tic Tac Toe'
+    @size = 3
+    @game_board = Board.new(@size)
     @players = [Player.new('O'), Player.new('X')]
   end
 
   def turn
     @players.each do |player|
       print_board
-      player.move(@game_board.board)
+      player.move(@game_board)
       current_result = Player.get_winner(@game_board)
       return current_result unless current_result.nil?
     end
     nil
   end
-
   def print_board
+    count = 1
+    #print "|"
+    (@size * 4 + 1).times {print '='}
     @game_board.board.each do |row|
-      row.each { |square| print square.nil? ? '#' : square }
-      puts ''
+      print "\n|"
+      row.each do |square| 
+        print square.nil? ? " #{count} |" : " #{square} |"
+        count += 1
+      end
+      print "\n|"
+      (@size - 1).times {print "---+"}
+      print "---|"
     end
-    puts ''
+    print "\n"
+    (@size *4 + 1).times {print '='}
+    puts "\n"
   end
 end
 
@@ -42,20 +47,18 @@ class Player
   end
 
   def move(board)
-    puts "Player #{@role}'s move! Enter two numbers between 1 and #{board.size}."
+    puts "Player #{@role}'s move! Enter the number of the square you would like to move to."
     move = [0, 0]
     loop do
-      print 'The format is "x y" : '
-      move = gets.chomp.split.map(&:to_i)
-      next if move.nil?
-      next if move.count != 2
-      next if move.none? { |coord| Range.new(1, board.size).include?(coord) }
-
-      move = move.map { |num| num - 1 }
-      move[1] = board.size - 1 - move[1]
-      next unless board[move[1]][move[0]].nil?
-
-      board[move[1]][move[0]] = @role
+      print "Number in range 1 to #{ board.size**2 }: "
+      input = gets.chomp.to_i
+      next unless (1..board.size**2).include?(input)
+      move = [input % board.size - 1, (input - 0.01).to_i/board.size]
+      unless board.board[move[1]][move[0]].nil?
+        print "That spot is taken!"
+        next
+      end
+      board.board[move[1]][move[0]] = @role
       break
     end
     puts ''
